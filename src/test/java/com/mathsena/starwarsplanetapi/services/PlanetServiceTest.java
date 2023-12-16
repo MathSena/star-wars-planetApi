@@ -1,30 +1,44 @@
 package com.mathsena.starwarsplanetapi.services;
 
 import com.mathsena.starwarsplanetapi.models.Planet;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
+import com.mathsena.starwarsplanetapi.repository.PlanetRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.when;
 
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class PlanetServiceTest {
 
-    @Autowired
+    @InjectMocks
     private PlanetService planetService;
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
+    @Mock
+    private PlanetRepository planetRepository;
 
     @Test
     @DisplayName("Given a planet, when create is called, then it should return a planet")
     void testCreatePlanet_WithValidData_returnsPlanet() {
-        Planet result = planetService.create(new Planet(1L, "name", "climate", "terrain"));
-        Assertions.assertEquals(new Planet(1L, "name", "climate", "terrain"), result);
+        when(planetRepository.save(new Planet(1L, "name", "climate", "terrain"))).thenReturn(new Planet(1L, "name", "climate", "terrain"));
+        Planet sut = planetService.create(new Planet(1L, "name", "climate", "terrain"));
+        assertThat(sut).isEqualTo(new Planet(1L, "name", "climate", "terrain"));
+
+    }
+
+
+    @Test
+    @DisplayName("Given a planet with invalid data, when create is called, then it should throw an exception")
+    public void createPlanet_withInvalidData_throwsException() {
+        when(planetRepository.save(new Planet(1L, "", "", ""))).thenThrow(IllegalArgumentException.class);
+
+        assertThatThrownBy(() -> planetService.create(new Planet(1L, "", "", "")))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 }
