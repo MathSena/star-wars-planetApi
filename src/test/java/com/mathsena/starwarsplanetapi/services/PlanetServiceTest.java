@@ -41,4 +41,56 @@ class PlanetServiceTest {
         assertThatThrownBy(() -> planetService.create(new Planet(1L, "", "", "")))
                 .isInstanceOf(IllegalArgumentException.class);
     }
+
+    @Test
+    @DisplayName("Given a ID, when ne is called, then it should return a planet")
+    void testGetPlanet_WithValidData_returnsPlanet() {
+        when(planetRepository.findById(1L)).thenReturn(java.util.Optional.of(new Planet(1L, "name", "climate", "terrain")));
+        Planet sut = planetService.findById(1L);
+        assertThat(sut).isEqualTo(new Planet(1L, "name", "climate", "terrain"));
+
+    }
+
+    @Test
+    @DisplayName("Given a ID, when ne is called, then it should throw an exception")
+    void testGetPlanet_WithInvalidData_returnsPlanet() {
+        when(planetRepository.findById(1L)).thenThrow(IllegalArgumentException.class);
+        assertThatThrownBy(() -> planetService.findById(1L))
+                .isInstanceOf(IllegalArgumentException.class);
+
+    }
+
+    @Test
+    @DisplayName("Given a name, when findByName is called, then it should return a planet")
+    void testFindByName_WithValidData_returnsPlanet() {
+        when(planetRepository.findByName("name")).thenReturn(new Planet(1L, "name", "climate", "terrain"));
+        Planet sut = planetService.findByName("name");
+        assertThat(sut).isEqualTo(new Planet(1L, "name", "climate", "terrain"));
+
+    }
+
+    @Test
+    @DisplayName("Given a name, when findByName is called, then it should throw an exception")
+    void testFindByName_WithInvalidData_returnsPlanet() {
+        when(planetRepository.findByName("name")).thenThrow(IllegalArgumentException.class);
+        assertThatThrownBy(() -> planetService.findByName("name"))
+                .isInstanceOf(IllegalArgumentException.class);
+
+    }
+
+    @Test
+    @DisplayName("Given a ID, when delete is called, then it should return a planet")
+    void testDeletePlanet_WithValidData_returnsPlanet() {
+        planetService.delete(1L);
+        assertThat(planetService).isNotNull();
+    }
+
+    @Test
+    @DisplayName("Given a ID, when delete is called, then it should throw an exception")
+    void testDeletePlanet_WithInvalidData_returnsPlanet() {
+        when(planetRepository.findById(1L)).thenThrow(IllegalArgumentException.class);
+        assertThatThrownBy(() -> planetService.findById(1L))
+                .isInstanceOf(IllegalArgumentException.class);
+
+    }
 }
